@@ -48,6 +48,18 @@ def sphere_points(radius, dims, quality):
     return np.array([point_on_sphere(radius, angles) for angles in itertools.product(*[list(np.arange(0, 2 * math.pi, 1.0 / quality)) for _ in range(dims - 1)])])
 
 
+def cube_points(radius, dims, quality):
+    pointss = []
+    for i in range(dims):
+        for c_i in [-radius, radius]:
+            points = list(itertools.product(*[list(np.arange(-radius, radius, 100.0/quality)) for _ in range(dims - 1)]))
+            for i in range(len(points)):
+                points[i] = list(points[i])
+                points[i].insert(i, c_i)
+        pointss += points
+    return np.array(pointss)
+
+
 def show_points(points, color="black", size=1):
     for point in points:
         x0 = point[0] - size
@@ -67,6 +79,11 @@ class Object:
         if self.type == "sphere":
             dims = self.properties["matrix"].shape[1]
             show_points(transform(self.properties["matrix"], sphere_points(self.properties["radius"], dims, self.properties["quality"])), self.properties["color"], self.properties["size"])
+        elif self.type == "cube":
+            dims = self.properties["matrix"].shape[1]
+            show_points(transform(self.properties["matrix"],
+                                  cube_points(self.properties["radius"], dims, self.properties["quality"])),
+                        self.properties["color"], self.properties["size"])
 
     def __str__(self):
         return str(dict(self.properties, type=self.type))
@@ -117,6 +134,16 @@ def create_sphere():
     angles = [random.random() * 2 * math.pi for i in range(4)]
     obj = Object("sphere", {"matrix": np.array([[math.cos(a), math.sin(a)] for a in angles]).transpose(), "quality": 5,
                             "radius": 3 * HEIGHT / 8, "size": 1, "color": "black"})
+    obj.show()
+    show_properties()
+
+
+def create_cube():
+    global obj
+    buttons.destroy()
+    angles = [random.random() * 2 * math.pi for i in range(4)]
+    obj = Object("cube", {"matrix": np.array([[math.cos(a), math.sin(a)] for a in angles]).transpose(), "quality": 5,
+                          "radius": 3 * HEIGHT / 8, "size": 1, "color": "black"})
     obj.show()
     show_properties()
 
@@ -186,6 +213,8 @@ buttons.grid(row=0, column=1, sticky=tk.NW)
 sphere = tk.Button(buttons, text="Sphere", command=create_sphere)
 sphere.grid(row=0, column=0, sticky=tk.NW)
 
+cube = tk.Button(buttons, text="Cube", command=create_cube)
+cube.grid(row=1, column=0, sticky=tk.NW)
 
 root.bind("<Control-q>", lambda x: quit_())
 root.bind("<Control-s>", lambda x: save())
