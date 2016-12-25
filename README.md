@@ -3,6 +3,8 @@
 Create multi-dimensional shapes (projected onto the plane).  
 It uses linear algebra to calculate how to project objects.
 
+To add another dimension, just add another column in the matrix. There should only be two rows.
+
 Requires:  
 Numpy  
 Python 2  
